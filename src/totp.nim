@@ -23,26 +23,26 @@ export hotp.HashFunctionType
 
 type
   Totp* = ref object
-    initialTime: float
+    initialCounterTime: float
     secret: string
     step, digits: int
     hashType: HashFunctionType
 
-proc newTotp*(secret: string, initialTime: float, step, digits: int, hashType: HashFunctionType): Totp =
+proc newTotp*(secret: string, initialCounterTime: float, step, digits: int, hashType: HashFunctionType): Totp =
   result = Totp(
     secret: secret,
-    initialTime: initialTime,
+    initialCounterTime: initialCounterTime,
     step: step,
     digits: digits,
     hashType: hashType
   )
 
-proc calculateT*(initialTime: float, step: int): int =
-  result = int(floor((epochTime() - initialTime) / float(step)))
+proc calculateT*(initialCounterTime: float, step: int): int =
+  result = int(floor((epochTime() - initialCounterTime) / float(step)))
 
 proc generate*(secret: string, t: int, digits: int, hashType: HashFunctionType): string =
   result = hotp.generate(secret, t, digits, hashType)
 
 proc generate*(totp: Totp, currentTime: float): string =
-  let t = calculateT(totp.initialTime, totp.step)
+  let t = calculateT(totp.initialCounterTime, totp.step)
   result = generate(totp.secret, t, totp.digits, totp.hashType)

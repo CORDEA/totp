@@ -24,7 +24,7 @@ const Secret = "01234567890123456789"
 # Used in google authenticator.
 const EncodedSecret = "GAYTEMZUGU3DOOBZGAYTEMZUGU3DOOBZ"
 
-let gen = newTotp(Secret, epochTime(), 1, 6, TypeSha1)
-for i in 0..5:
+let gen = newTotp(Secret, 0, 30, 6, TypeSha1)
+for i in 1..10:
   echo gen.generate(epochTime())
-  sleep(1000)
+  sleep(30 * 1000)
