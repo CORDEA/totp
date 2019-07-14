@@ -21,8 +21,21 @@ import times
 type
   UnsupportedDigitLengthError = object of Exception
 
-proc calculateT*(t0: float, step: int): int =
-  result = int(floor((epochTime() - t0) / float(step)))
+  Totp* = ref object
+    initialTime: float
+    secret: string
+    step, digits: int
+
+proc newTotp*(secret: string, initialTime: float, step, digits: int): Totp =
+  result = Totp(
+    secret: secret,
+    initialTime: initialTime,
+    step: step,
+    digits: digits
+  )
+
+proc calculateT*(initialTime: float, step: int): int =
+  result = int(floor((epochTime() - initialTime) / float(step)))
 
 proc generate*(secret: string, t: int, digits: int): string =
   var text = $t
@@ -54,3 +67,7 @@ proc generate*(secret: string, t: int, digits: int): string =
   result = $otp
   while len(result) < digits:
     result = "0" & result
+
+proc generate*(totp: Totp, currentTime: float): string =
+  let t = calculateT(totp.initialTime, totp.step)
+  result = generate(totp.secret, t, totp.digits)
