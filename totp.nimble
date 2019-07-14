@@ -8,3 +8,4 @@ srcDir      = "src"
 # Deps
 requires "nim >= 0.19.9"
 requires "hmac"
+requires "hotp"

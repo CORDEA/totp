@@ -16,11 +16,10 @@
 
 import hmac
 import math
+import hotp
 import times
 
 type
-  UnsupportedDigitLengthError = object of Exception
-
   Totp* = ref object
     initialTime: float
     secret: string
@@ -38,35 +37,7 @@ proc calculateT*(initialTime: float, step: int): int =
   result = int(floor((epochTime() - initialTime) / float(step)))
 
 proc generate*(secret: string, t: int, digits: int): string =
-  var text = $t
-  while len(text) < 8:
-    text = "0" & text
-  echo text
-
-  let hash = hmac_sha1(secret, text)
-  let offset = hash[len(hash)-1] and 0xf
-  let binary =
-    (int(hash[offset] and 0x7f) shl 24) or
-      (int(hash[offset+1] and 0xff) shl 16) or
-      (int(hash[offset+2] and 0xff) shl 8) or
-      int(hash[offset+3] and 0xff)
-  var otp = 0
-  case digits
-  of 6:
-    otp = binary mod 1000000
-  of 7:
-    otp = binary mod 10000000
-  of 8:
-    otp = binary mod 100000000
-  else:
-    discard
-
-  if otp == 0:
-    raise newException(UnsupportedDigitLengthError, "Unsupported number of digits.")
-
-  result = $otp
-  while len(result) < digits:
-    result = "0" & result
+  result = hotp.generate(secret, t, digits)
 
 proc generate*(totp: Totp, currentTime: float): string =
   let t = calculateT(totp.initialTime, totp.step)
