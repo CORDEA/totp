@@ -14,7 +14,6 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2019-07-14
 
-import hmac
 import math
 import hotp
 import times
